@@ -231,7 +231,10 @@
         document.getElementById('tab-' + screenId).classList.add('active');
 
         if(screenId === 'stats') renderStats();
-        if(screenId === 'tests') checkResume();
+        if(screenId === 'tests') {
+            renderTopics(); // Добавляем отрисовку тем
+            checkResume();
+        }
     }
 
     function checkResume() {
@@ -356,23 +359,18 @@
     function finishTest() {
         const stats = JSON.parse(localStorage.getItem('stats') || '{}');
         const topic = currentTest.topic;
-        
         if (!stats[topic]) stats[topic] = { solved: 0, total: 0 };
-        
-        // Суммируем новые результаты с уже имеющимися
         stats[topic].solved += currentTest.correct;
         stats[topic].total += currentTest.tasks.length;
-        
         localStorage.setItem('stats', JSON.stringify(stats));
-        localStorage.removeItem('active_test');
 
-        // Сначала обновляем данные на экране статистики
-        renderStats(); 
+        localStorage.removeItem('active_test');
         
-        alert(`Тест по теме "${topic}" завершен! Ваш результат: ${currentTest.correct} из ${currentTest.tasks.length}`);
+        // Сначала отрисовываем темы, чтобы экран не был пустым
+        renderTopics(); 
         
-        // Переключаемся на вкладку статистики, чтобы пользователь сразу увидел прогресс
-        switchTab('stats'); 
+        alert(`Тест завершен! Результат: ${currentTest.correct} из ${currentTest.tasks.length}`);
+        switchTab('stats');
     }
     }
 

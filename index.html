@@ -231,10 +231,7 @@
         document.getElementById('tab-' + screenId).classList.add('active');
 
         if(screenId === 'stats') renderStats();
-        if(screenId === 'tests') {
-            renderTopics(); // Добавляем отрисовку тем
-            checkResume();
-        }
+        if(screenId === 'tests') checkResume();
     }
 
     function checkResume() {
@@ -372,7 +369,7 @@
         alert(`Тест завершен! Результат: ${currentTest.correct} из ${currentTest.tasks.length}`);
         switchTab('stats');
     }
-    }
+    
 
     function renderStats() {
         const container = document.getElementById('stats-container');

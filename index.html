@@ -6,16 +6,21 @@
     <title>Математика ЦТ 2026</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        /* ФИКСИРОВАННЫЕ ЦВЕТА (не зависят от темы телефона) */
         :root {
-            --tg-theme-bg-color: #f0f2f5;
-            --primary-color: #007aff;
-            --success-color: #34c759;
-            --error-color: #ff3b30;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-main: #1c1c1e;
+            --text-secondary: #8e8e93;
+            --primary: #007aff;
+            --success: #34c759;
+            --error: #ff3b30;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--tg-theme-bg-color);
+            background-color: var(--bg-color) !important;
+            color: var(--text-main) !important;
             margin: 0;
             padding: 0;
             display: flex;
@@ -27,21 +32,12 @@
         .content-area {
             flex: 1;
             overflow-y: auto;
-            padding: 15px 15px 80px 15px; /* Отступ под таббар */
+            padding: 15px 15px 80px 15px;
         }
 
-        .app-container {
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            box-sizing: border-box;
-        }
+        h2 { color: var(--text-main); margin-top: 10px; }
 
-        /* Таббар как на скрине image_1e16f7.png */
+        /* Таббар (нижнее меню) */
         .tab-bar {
             position: fixed;
             bottom: 0;
@@ -53,6 +49,7 @@
             justify-content: space-around;
             align-items: center;
             padding-bottom: env(safe-area-inset-bottom);
+            z-index: 100;
         }
 
         .tab-item {
@@ -61,149 +58,191 @@
             align-items: center;
             background: none;
             border: none;
-            color: #8e8e93;
+            color: var(--text-secondary);
             font-size: 11px;
             cursor: pointer;
-            transition: 0.2s;
+            width: 50%;
         }
 
-        .tab-item.active { color: var(--primary-color); }
-        .tab-icon { font-size: 24px; margin-bottom: 4px; }
+        .tab-item.active { color: var(--primary); }
+        .tab-icon { font-size: 22px; margin-bottom: 4px; }
 
-        /* Экраны */
-        .screen { display: none; }
-        .screen.active { display: block; }
-
-        /* Стили меню и тестов */
+        /* Карточки тем */
         .topic-card {
-            background: #f1f1f7;
-            padding: 18px;
-            border-radius: 12px;
-            margin-bottom: 10px;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
             font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
+        /* Баннер продолжения теста */
         .resume-banner {
             background: #e7f3ff;
-            border: 1px solid var(--primary-color);
+            border: 1px solid var(--primary);
             padding: 15px;
             border-radius: 12px;
             margin-bottom: 20px;
             display: none;
         }
 
-        .stat-item {
-            background: #fff;
+        /* Экран теста */
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        .image-container img {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 15px;
             border: 1px solid #eee;
+        }
+
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .opt-btn { 
+            background: #f1f1f7; 
+            padding: 14px; 
+            border-radius: 12px; 
+            border: 2px solid transparent; 
+            color: var(--text-main);
+            font-weight: 500;
+        }
+        .opt-btn.selected { border-color: var(--primary); background: #e7f3ff; }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #d1d1d6;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        .main-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .correct-bg { background-color: var(--success) !important; }
+        .wrong-bg { background-color: var(--error) !important; }
+
+        /* Статистика */
+        .stat-item {
+            background: white;
             padding: 15px;
             border-radius: 12px;
             margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
         }
-
-        .progress-bar-bg { background: #e5e5ea; height: 8px; border-radius: 4px; margin-top: 8px; }
-        .progress-bar-fill { background: var(--success-color); height: 100%; border-radius: 4px; transition: 0.5s; }
-
-        .image-container img { width: 100%; border-radius: 12px; margin-bottom: 15px; }
-        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .opt-btn { background: #f1f1f7; padding: 12px; border-radius: 10px; border: 2px solid transparent; cursor: pointer; }
-        .opt-btn.selected { border-color: var(--primary-color); background: #e7f3ff; }
-        
-        input[type="text"] { width: 100%; padding: 15px; border: 2px solid #d1d1d6; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; }
-        .main-btn { width: 100%; padding: 16px; background: var(--primary-color); color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; }
-        
-        .correct-bg { background-color: var(--success-color) !important; }
-        .wrong-bg { background-color: var(--error-color) !important; }
-        .solution-box { display: none; margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 15px; }
+        .progress-bg { background: #e5e5ea; height: 8px; border-radius: 4px; margin-top: 8px; overflow: hidden; }
+        .progress-fill { background: var(--success); height: 100%; width: 0%; transition: 0.5s; }
     </style>
 </head>
 <body>
 
 <div class="content-area">
-    <!-- ТЕСТЫ / ГЛАВНАЯ -->
+    <!-- ВКЛАДКА: ТЕСТЫ -->
     <div id="screen-tests" class="screen active">
         <div id="resume-container" class="resume-banner">
-            <p style="margin: 0 0 10px 0; font-size: 14px;">У тебя есть незаконченный тест!</p>
-            <button class="main-btn" style="padding: 10px;" onclick="resumeTest()">Продолжить тему "<span id="resume-topic"></span>"</button>
+            <p style="margin: 0 0 10px 0; font-size: 14px; font-weight: 500;">У тебя есть незаконченный тест!</p>
+            <button class="main-btn" style="padding: 10px; font-size: 14px;" onclick="resumeTest()">Продолжить тему "<span id="resume-topic"></span>"</button>
         </div>
-        <h2>Темы для подготовки</h2>
+        <h2>Темы ЦТ 2026</h2>
         <div id="topic-list"></div>
     </div>
 
-    <!-- ТЕСТ (ИНТЕРФЕЙС) -->
+    <!-- ЭКРАН ТЕСТА (СКРЫТ ПО УМОЛЧАНИЮ) -->
     <div id="screen-quiz" class="screen">
-        <div class="header" style="display:flex; justify-content: space-between; margin-bottom:15px; color:#8e8e93;">
+        <div style="display:flex; justify-content: space-between; margin-bottom:15px; color:var(--text-secondary); font-size: 14px;">
             <span id="q-topic-title">Тема</span>
             <span id="q-progress">0 / 0</span>
         </div>
         <div class="image-container"><img id="q-img" src=""></div>
+        
         <div id="options-container" class="options-grid"></div>
-        <input type="text" id="user-answer" placeholder="Ответ">
-        <div id="wrong-hint" style="color:var(--error-color); text-align:center; display:none; margin-bottom:10px; font-weight:bold;"></div>
+        <input type="text" id="user-answer" placeholder="Введите ответ">
+        
+        <div id="wrong-hint" style="color:var(--error); text-align:center; display:none; margin-bottom:15px; font-weight:bold;"></div>
+        
         <button class="main-btn" id="submit-btn" onclick="handleCheck()">Ответить</button>
-        <div id="solution-section" class="solution-box">
+
+        <div id="solution-section" style="display:none; margin-top:20px; border-top: 1px dashed #ccc; padding-top:20px;">
+            <p style="font-weight: 600; margin-bottom: 10px;">Разбор задания:</p>
             <div class="image-container"><img id="s-img" src=""></div>
-            <button class="main-btn" style="background:var(--success-color);" id="next-btn" onclick="handleNext()">Далее</button>
+            <button class="main-btn" style="background:var(--success);" id="next-btn" onclick="handleNext()">Далее</button>
         </div>
     </div>
 
-    <!-- СТАТИСТИКА -->
+    <!-- ВКЛАДКА: СТАТИСТИКА -->
     <div id="screen-stats" class="screen">
-        <h2>Твой прогресс</h2>
+        <h2>Твои успехи</h2>
         <div id="stats-container"></div>
     </div>
 </div>
 
-<!-- ТАББАР (image_1e16f7.png) -->
+<!-- НИЖНЯЯ ПАНЕЛЬ -->
 <nav class="tab-bar">
-    <button class="tab-item active" onclick="switchTab('tests', this)">
-        <span class="tab-icon">📚</span>
+    <button class="tab-item active" id="tab-tests" onclick="switchTab('tests')">
+        <span class="tab-icon">📖</span>
         <span>Тесты</span>
     </button>
-    <button class="tab-item" onclick="switchTab('stats', this)">
-        <span class="tab-icon">📊</span>
+    <button class="tab-item" id="tab-stats" onclick="switchTab('stats')">
+        <span class="tab-icon">📈</span>
         <span>Статистика</span>
     </button>
 </nav>
 
 <script>
+    // БАЗА ДАННЫХ (Замени ссылки на свои скриншоты)
     const database = {
         "Тригонометрия": [
-            { question: "https://placehold.co/600x400?text=Trig+Q1", solution: "https://placehold.co/600x400?text=Trig+Sol", options: ["0", "1", "0.5", "-1"], answer: "0.5" },
-            { question: "https://placehold.co/600x400?text=Trig+Q2", solution: "https://placehold.co/600x400?text=Trig+Sol", answer: "180" }
+            { question: "https://placehold.co/600x400?text=Вопрос+1", solution: "https://placehold.co/600x400?text=Решение+1", options: ["0", "1", "0.5", "-1"], answer: "0.5" },
+            { question: "https://placehold.co/600x400?text=Вопрос+2", solution: "https://placehold.co/600x400?text=Решение+2", answer: "120" }
         ],
         "Планиметрия": [
-            { question: "https://placehold.co/600x400?text=Geom+Q1", solution: "https://placehold.co/600x400?text=Geom+Sol", answer: "25" }
+            { question: "https://placehold.co/600x400?text=Геометрия+1", solution: "https://placehold.co/600x400?text=Решение+Гео", answer: "40" }
+        ],
+        "Прогрессии": [
+            { question: "https://placehold.co/600x400?text=Прогрессия+1", solution: "https://placehold.co/600x400?text=Решение+Прог", answer: "10" }
         ]
     };
 
     let currentTest = null;
+    let selectedOption = null;
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // Переключение вкладок
-    function switchTab(screenId, btn) {
+    function switchTab(screenId) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+        
         document.getElementById('screen-' + screenId).classList.add('active');
-        btn.classList.add('active');
+        document.getElementById('tab-' + screenId).classList.add('active');
+
         if(screenId === 'stats') renderStats();
         if(screenId === 'tests') checkResume();
     }
 
-    // Проверка сохраненного прогресса
     function checkResume() {
         const saved = localStorage.getItem('active_test');
-        const container = document.getElementById('resume-container');
+        const banner = document.getElementById('resume-container');
         if (saved) {
             const data = JSON.parse(saved);
             document.getElementById('resume-topic').innerText = data.topic;
-            container.style.display = 'block';
+            banner.style.display = 'block';
         } else {
-            container.style.display = 'none';
+            banner.style.display = 'none';
         }
     }
 
@@ -213,19 +252,14 @@
         Object.keys(database).forEach(topic => {
             const div = document.createElement('div');
             div.className = 'topic-card';
-            div.innerHTML = `${topic} <span>→</span>`;
+            div.innerHTML = `<span>${topic}</span> <span style="color:var(--primary)">→</span>`;
             div.onclick = () => startNewTest(topic);
             list.appendChild(div);
         });
     }
 
     function startNewTest(topic) {
-        currentTest = {
-            topic: topic,
-            tasks: database[topic],
-            idx: 0,
-            correct: 0
-        };
+        currentTest = { topic: topic, tasks: database[topic], idx: 0, correct: 0 };
         saveProgress();
         openQuiz();
     }
@@ -247,6 +281,7 @@
 
     function renderTask() {
         const task = currentTest.tasks[currentTest.idx];
+        selectedOption = null;
         document.getElementById('q-topic-title').innerText = currentTest.topic;
         document.getElementById('q-progress').innerText = `${currentTest.idx + 1} / ${currentTest.tasks.length}`;
         document.getElementById('q-img').src = task.question;
@@ -256,7 +291,7 @@
         
         const btn = document.getElementById('submit-btn');
         btn.disabled = false;
-        btn.classList.remove('correct-bg', 'wrong-bg');
+        btn.className = 'main-btn';
         btn.innerText = "Ответить";
 
         const optContainer = document.getElementById('options-container');
@@ -270,7 +305,11 @@
                 const b = document.createElement('button');
                 b.className = 'opt-btn';
                 b.innerText = opt;
-                b.onclick = () => { selectedOption = opt; document.querySelectorAll('.opt-btn').forEach(el => el.classList.remove('selected')); b.classList.add('selected'); };
+                b.onclick = () => {
+                    selectedOption = opt;
+                    document.querySelectorAll('.opt-btn').forEach(el => el.classList.remove('selected'));
+                    b.classList.add('selected');
+                };
                 optContainer.appendChild(b);
             });
         } else {
@@ -292,12 +331,12 @@
         if (userVal == task.answer) {
             currentTest.correct++;
             btn.classList.add('correct-bg');
-            btn.innerText = "Верно!";
+            btn.innerText = "Правильно!";
             tg.HapticFeedback.notificationOccurred('success');
         } else {
             btn.classList.add('wrong-bg');
-            btn.innerText = "Ошибка";
-            document.getElementById('wrong-hint').innerText = `Ответ: ${task.answer}`;
+            btn.innerText = "Неверно";
+            document.getElementById('wrong-hint').innerText = `Правильный ответ: ${task.answer}`;
             document.getElementById('wrong-hint').style.display = 'block';
             tg.HapticFeedback.notificationOccurred('error');
         }
@@ -315,7 +354,6 @@
     }
 
     function finishTest() {
-        // Сохраняем в общую статистику
         const stats = JSON.parse(localStorage.getItem('stats') || '{}');
         const topic = currentTest.topic;
         if (!stats[topic]) stats[topic] = { solved: 0, total: 0 };
@@ -324,8 +362,8 @@
         localStorage.setItem('stats', JSON.stringify(stats));
 
         localStorage.removeItem('active_test');
-        alert(`Тест завершен! Результат: ${currentTest.correct} из ${currentTest.tasks.length}`);
-        switchTab('tests', document.querySelector('.tab-item'));
+        alert(`Тест по теме ${topic} завершен!`);
+        switchTab('tests');
     }
 
     function renderStats() {
@@ -336,12 +374,12 @@
             const percent = data.total > 0 ? Math.round((data.solved / data.total) * 100) : 0;
             return `
                 <div class="stat-item">
-                    <div style="display:flex; justify-content:space-between">
-                        <strong>${topic}</strong>
-                        <span>${percent}%</span>
+                    <div style="display:flex; justify-content:space-between; font-weight:600;">
+                        <span>${topic}</span>
+                        <span style="color:var(--primary)">${percent}%</span>
                     </div>
-                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${percent}%"></div></div>
-                    <div style="font-size:12px; color:#8e8e93; margin-top:5px">Верно: ${data.solved} из ${data.total}</div>
+                    <div class="progress-bg"><div class="progress-fill" style="width:${percent}%"></div></div>
+                    <div style="font-size:12px; color:var(--text-secondary); margin-top:8px">Решено верно: ${data.solved} из ${data.total}</div>
                 </div>
             `;
         }).join('');
